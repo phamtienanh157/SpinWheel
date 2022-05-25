@@ -54,8 +54,8 @@ button {
 
 #selector {
   position: absolute;
-  top: 21vh;
-  right: 47.5vw;
+  top: 17vh;
+  right: 48.5vw;
   font-size: 40px;
   z-index: 3;
 }

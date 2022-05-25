@@ -1,37 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from 'react';
 
-function App() {
-  const [list] = useState([
-    '$100',
-    '$500',
-    '$9,999',
-    '$1',
-    '$60',
-    '$1,000',
-    '$4.44',
-    '$0',
-    '$333',
-  ]);
+const list = Array(21)
+  .fill(0)
+  .map(() => Math.floor(Math.random() * 100));
 
+console.log('🚀 ~ file: App.jsx ~ line 6 ~ list', list);
+
+list[Math.floor(Math.random() * list.length)] = 101;
+
+function App() {
   const [radius] = useState(75);
   const [rotate, setRotate] = useState(0);
-  const [easeOut, setEaseOut] = useState(2);
-  const [angle, setAngle] = useState(0);
-  const [top, setTop] = useState(null);
-  const [offset, setOffset] = useState(null);
-  const [net, setNet] = useState(null);
+  const [easeOut] = useState(2);
   const [result, setResult] = useState(null);
-  const [spinning, setSpinning] = useState(false);
 
   useEffect(() => {
     let numOptions = list.length;
     let arcSize = (2 * Math.PI) / numOptions;
-    setAngle(arcSize);
-
-    // get index of starting position of selector
-    topPosition(numOptions, arcSize);
 
     // dynamically generate sectors from state list
     let angle = 0;
@@ -41,31 +27,6 @@ function App() {
       angle += arcSize;
     }
   }, []);
-
-  const topPosition = (num, angle) => {
-    // set starting index and angle offset based on list length
-    // works upto 9 options
-    let topSpot = null;
-    let degreesOff = null;
-    if (num === 9) {
-      topSpot = 7;
-      degreesOff = Math.PI / 2 - angle * 2;
-    } else if (num === 8) {
-      topSpot = 6;
-      degreesOff = 0;
-    } else if (num <= 7 && num > 4) {
-      topSpot = num - 1;
-      degreesOff = Math.PI / 2 - angle;
-    } else if (num === 4) {
-      topSpot = num - 1;
-      degreesOff = 0;
-    } else if (num <= 3) {
-      topSpot = num;
-      degreesOff = Math.PI / 2;
-    }
-    setTop(topSpot - 1);
-    setOffset(degreesOff);
-  };
 
   const renderSector = (index, text, start, arc, color) => {
     // create canvas arc for each list element
@@ -107,12 +68,17 @@ function App() {
   };
 
   const spin = () => {
-    // set random spin degree and ease out time
-    // set state variables to initiate animation
-    let randomSpin = Math.floor(Math.random() * 900) + 500 + rotate;
+    const key = list.findIndex((item) => item === 101);
+    let distance = 0;
+    if (key < 15) {
+      distance = 15 - key;
+    } else {
+      distance = list.length - Math.abs(15 - key);
+    }
 
-    setRotate(randomSpin);
-    setSpinning(true);
+    let randomSpin = (180 * distance * 2) / list.length;
+
+    setRotate(randomSpin + 360 * 3);
 
     // calcalute result after wheel stops spinning
     setTimeout(() => {
@@ -120,35 +86,8 @@ function App() {
     }, 2000);
   };
 
-  const reset = () => {
-    // reset wheel and result
-    setRotate(0);
-    setEaseOut(0);
-    setResult(null);
-    setSpinning(false);
-  };
-
   const getResult = (spin) => {
-    // find net rotation and add to offset angle
-    // repeat substraction of inner angle amount from total distance traversed
-    // use count as an index to find value of result from state list
-    let netRotation = ((spin % 360) * Math.PI) / 180; // RADIANS
-    let travel = netRotation + offset;
-    let count = top + 1;
-    while (travel > 0) {
-      travel = travel - angle;
-      count--;
-    }
-    let result;
-    if (count >= 0) {
-      result = count;
-    } else {
-      result = list.length + count;
-    }
-
-    // set state variable to display result
-    setNet(netRotation);
-    setResult(result);
+    setResult(101);
   };
 
   return (
@@ -164,23 +103,13 @@ function App() {
           WebkitTransition: `-webkit-transform ${easeOut}s ease-out`,
         }}
       />
-
-      {/* {spinning ? (
-        <button type='button' id='reset' onClick={reset}>
-          reset
-        </button>
-      ) : (
-        <button type='button' id='spin' onClick={spin}>
-          spin
-        </button>
-      )} */}
       <button type='button' id='spin' onClick={spin}>
         spin
       </button>
       <div className='display'>
         <span id='readout'>
           YOU WON:{'  '}
-          <span id='result'>{list[result]}</span>
+          <span id='result'>{result}</span>
         </span>
       </div>
     </div>
